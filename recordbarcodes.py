@@ -27,6 +27,9 @@ def clearScreen():
 
 timer = Timer(3.0, clearScreen)
 clearScreen()
+
+lcd.set_backlight(1)
+lcd.message("Attendance\nScanner v2.0")
 while 1 == 1 :
     # MARK: Get member barcode and put it in the records CSV
     char = getch.getch()
@@ -34,57 +37,58 @@ while 1 == 1 :
         if char[:1].isdigit() :
             barcode += char
     else :
-        timer.cancel()
-        currenttime = datetime.today()
+        if len(barcode) > 4:
+            timer.cancel()
+            currenttime = datetime.today()
 
-        with open(scansFileAbsPath, 'r') as csvfile:
-            reader = csv.DictReader(csvfile, fieldnames = ['id', 'timein', 'timeout'])
+            with open(scansFileAbsPath, 'r') as csvfile:
+                reader = csv.DictReader(csvfile, fieldnames = ['id', 'timein', 'timeout'])
 
-            rownum = -1
-            found = False
+                rownum = -1
+                found = False
 
-            for row in reader:
-                rownum = rownum + 1
-                if row['id'] == barcode and row['timeout'] == ' ':
-                    firsttime = datetime.strptime(row['timein'], '%Y-%m-%d %H:%M:%S.%f')
-                    nowtime = datetime.strptime(str(currenttime), '%Y-%m-%d %H:%M:%S.%f')
+                for row in reader:
+                    rownum = rownum + 1
+                    if row['id'] == barcode and row['timeout'] == ' ':
+                        firsttime = datetime.strptime(row['timein'], '%Y-%m-%d %H:%M:%S.%f')
+                        nowtime = datetime.strptime(str(currenttime), '%Y-%m-%d %H:%M:%S.%f')
 
-                    if firsttime.date() == nowtime.date():
-                        found = True
-                        totaltime = nowtime - firsttime
-                        bottle_list = []
+                        if firsttime.date() == nowtime.date():
+                            found = True
+                            totaltime = nowtime - firsttime
+                            bottle_list = []
 
-                        # Read all data from the csv file.
-                        with open(scansFileAbsPath, 'rb') as b:
-                            bottles = csv.reader(b)
-                            bottle_list.extend(bottles)
+                            # Read all data from the csv file.
+                            with open(scansFileAbsPath, 'rb') as b:
+                                bottles = csv.reader(b)
+                                bottle_list.extend(bottles)
 
-                        # data to override in the format {line_num_to_override:data_to_write}.
-                        line_to_override = {rownum:[row['id'], str(firsttime) ,str(nowtime)] }
+                            # data to override in the format {line_num_to_override:data_to_write}.
+                            line_to_override = {rownum:[row['id'], str(firsttime) ,str(nowtime)] }
 
-                        # Write data to the csv file and replace the lines in the line_to_override dict.
-                        with open(scansFileAbsPath, 'wb') as b:
-                            writer = csv.writer(b)
-                            for line, row1 in enumerate(bottle_list):
-                                data = line_to_override.get(line, row1)
-                                writer.writerow(data)
+                            # Write data to the csv file and replace the lines in the line_to_override dict.
+                            with open(scansFileAbsPath, 'wb') as b:
+                                writer = csv.writer(b)
+                                for line, row1 in enumerate(bottle_list):
+                                    data = line_to_override.get(line, row1)
+                                    writer.writerow(data)
 
-            lcd.set_backlight(1);
-            lcd.clear();
-            if found == False :
-                with open(scansFileAbsPath, 'a') as scansFile:
-                    scansFile.write(barcode) #Barcode
-                    scansFile.write(",")
-                    scansFile.write(str(currenttime)) #Local time
-                    scansFile.write(",")
-                    scansFile.write(" ")
-                    scansFile.write("\n")
+                lcd.set_backlight(1);
+                lcd.clear();
+                if found == False :
+                    with open(scansFileAbsPath, 'a') as scansFile:
+                        scansFile.write(barcode) #Barcode
+                        scansFile.write(",")
+                        scansFile.write(str(currenttime)) #Local time
+                        scansFile.write(",")
+                        scansFile.write(" ")
+                        scansFile.write("\n")
 
-                lcd.message("Signed in\n" + barcode)
+                    lcd.message("Signed in\n" + barcode)
 
-            else:
-                timething = datetime.strptime(str(totaltime), '%H:%M:%S.%f')
-                lcd.message(barcode + "\n" + str(timething.hour) + "hr " + str(timething.minute) + "min")
-        timer = Timer(3.0, clearScreen)
-        timer.start()
+                else:
+                    timething = datetime.strptime(str(totaltime), '%H:%M:%S.%f')
+                    lcd.message(barcode + "\n" + str(timething.hour) + "hr " + str(timething.minute) + "min")
+            timer = Timer(3.0, clearScreen)
+            timer.start()
         barcode = ""

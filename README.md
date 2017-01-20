@@ -9,7 +9,7 @@ This script records inputs from the barcode scanner(which register as key presse
 ### `proccessrecords.py`
 **Usage:** `python proccessrecords.py <output filename>.csv <start date> priv=<true/false>`
 
-Called periodically in `proccessupload.py`. This program calculates the total student in-workshop hours gained after a certain date(specified by `<start date>`) and outputs it in `<output filename>.csv`
+This program calculates the total student in-workshop hours gained after a certain date(specified by `<start date>`) and outputs it in `<output filename>.csv`
 
 `<output filename>`
 **Note:** Include the .csv extension

@@ -31,7 +31,7 @@ with open(scansFileAbsPath, 'r') as csvfile:
     hours = []
 
     for row in reader:
-        if row['timeout'] != "" and row['id'] != "id" and datetime.strptime(row['timein'], '%Y-%m-%d %H:%M:%S.%f') > datetime.strptime(startDate + " 00:00:00.000000", '%Y-%m-%d %H:%M:%S.%f'):
+        if row['timeout'] != "" and row['timeout'] != " " and len(row['id']) > 4 and row['id'] != "id" and datetime.strptime(row['timein'], '%Y-%m-%d %H:%M:%S.%f') > datetime.strptime(startDate + " 00:00:00.000000", '%Y-%m-%d %H:%M:%S.%f'):
             found = False
             for code in ids:
                 if code == row['id']:
