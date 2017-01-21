@@ -32,6 +32,8 @@ def reset_timer():
 timer = Timer(10.0, clearScreen)
 clearScreen()
 
+print("Number people signed in widget")
+
 while 1 == 1:
     if lcd.is_pressed(LCD.SELECT):
         signedin = 0
