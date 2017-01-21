@@ -20,7 +20,7 @@ def clearScreen():
     lcd.set_backlight(0)
 
 def display(message):
-    lcd.clearScreen
+    clearScreen()
     lcd.set_backlight(1)
     lcd.message(message)
     reset_timer()
@@ -45,13 +45,14 @@ while 1 == 1:
             for row in reader:
                 if row['timeout'] == " ":
                     firsttime = datetime.strptime(row['timein'], '%Y-%m-%d %H:%M:%S.%f')
-                    nowtime = datetime.strptime(str(currenttime), '%Y-%m-%d %H:%M:%S.%f')
+                    nowtime = datetime.strptime(str(datetime.today()), '%Y-%m-%d %H:%M:%S.%f')
 
                     if firsttime.date() == nowtime.date():
-                        if item in ids:
+                        if row['id'] in ids:
+                            rand=0
                         else:
                             ids.append(row['id'])
 
             signedin = len(ids)
 
-        display(signedin + " people\nsigned in now.")
+        display(str(signedin) + " people\nsigned in now.")
