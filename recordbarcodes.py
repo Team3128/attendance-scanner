@@ -25,18 +25,29 @@ def clearScreen():
     lcd.clear()
     lcd.set_backlight(0)
 
+def display(message):
+    lcd.clearScreen
+    lcd.set_backlight(1)
+    lcd.message(message)
+    reset_timer()
+
+def reset_timer():
+    timer = Timer(3.0, clearScreen)
+    timer.start()
+
 timer = Timer(3.0, clearScreen)
 clearScreen()
 
 lcd.set_backlight(1)
-lcd.message("Attendance\nScanner v2.0")
-while 1 == 1 :
+lcd.message("Attendance\nScanner v2.1")
+
+while 1 == 1:
     # MARK: Get member barcode and put it in the records CSV
     char = getch.getch()
-    if char != " " :
+    if char != " ":
         if char[:1].isdigit() :
             barcode += char
-    else :
+    else:
         if len(barcode) > 4:
             timer.cancel()
             currenttime = datetime.today()
@@ -73,22 +84,14 @@ while 1 == 1 :
                                     data = line_to_override.get(line, row1)
                                     writer.writerow(data)
 
-                lcd.set_backlight(1);
-                lcd.clear();
-                if found == False :
+                if found == False:
                     with open(scansFileAbsPath, 'a') as scansFile:
-                        scansFile.write(barcode) #Barcode
-                        scansFile.write(",")
-                        scansFile.write(str(currenttime)) #Local time
-                        scansFile.write(",")
-                        scansFile.write(" ")
-                        scansFile.write("\n")
+                        scansFile.write(str(barcode) + "," + str(currenttime) + ", \n")
 
-                    lcd.message("Signed in\n" + barcode)
+                    display("Signed in\n" + barcode)
 
                 else:
-                    timething = datetime.strptime(str(totaltime), '%H:%M:%S.%f')
-                    lcd.message(barcode + "\n" + str(timething.hour) + "hr " + str(timething.minute) + "min")
-            timer = Timer(3.0, clearScreen)
-            timer.start()
+                    hourslogged = datetime.strptime(str(totaltime), '%H:%M:%S.%f')
+                    display(barcode + "\n" + str(hourslogged.hour) + "hr " + str(hourslogged.minute) + "min")
+
         barcode = ""

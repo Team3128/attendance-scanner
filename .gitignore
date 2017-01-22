@@ -1,3 +1,4 @@
 scans.csv
 tmp_data/
 config/privatekey.txt
+*.pyc
