@@ -5,37 +5,19 @@ import time
 import getch
 import os
 import csv
-from threading import Timer
 
-import Adafruit_CharLCD as LCD
-lcd = LCD.Adafruit_CharLCDPlate()
+from lcdpanel import LCDPanel
+lcd = LCDPanel(10.0)
 
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
 
 scansFileRelPath = "scans.csv"
 scansFileAbsPath = os.path.join(script_dir, scansFileRelPath)
 
-def clearScreen():
-    lcd.clear()
-    lcd.set_backlight(0)
-
-def display(message):
-    clearScreen()
-    lcd.set_backlight(1)
-    lcd.message(message)
-    reset_timer()
-
-def reset_timer():
-    timer = Timer(3.0, clearScreen)
-    timer.start()
-
-timer = Timer(10.0, clearScreen)
-clearScreen()
-
-print("Number people signed in widget")
+print("Button apps starting up...")
 
 while 1 == 1:
-    if lcd.is_pressed(LCD.SELECT):
+    if lcd.lcdPanel.is_pressed(LCD.SELECT):
         signedin = 0
         with open(scansFileAbsPath, 'r') as csvfile:
             reader = csv.DictReader(csvfile, fieldnames = ['id', 'timein', 'timeout'])
@@ -55,4 +37,5 @@ while 1 == 1:
 
             signedin = len(ids)
 
-        display(str(signedin) + " people\nsigned in now.")
+        lcd.display(str(signedin) + " people\nsigned in now.")
+        lcd.resetTimer()

@@ -7,7 +7,7 @@ from datetime import datetime
 
 script_dir = os.path.dirname(__file__)
 
-scansFilePath = os.path.join(script_dir, "scans.csv")
+scansFilePath = os.path.join(script_dir, "tmp_data/priv/scans.csv")
 tempFilePath = os.path.join(script_dir, "tmp_data/temp.csv")
 
 class RecordProccess:

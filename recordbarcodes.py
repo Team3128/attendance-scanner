@@ -5,41 +5,18 @@ import time
 import getch
 import os
 import csv
-from threading import Timer
 
-import Adafruit_CharLCD as LCD
-lcd = LCD.Adafruit_CharLCDPlate()
+from lcdpanel import LCDPanel
+lcd = LCDPanel(3.0)
 
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
 
-scansFileRelPath = "scans.csv"
-scansFileAbsPath = os.path.join(script_dir, scansFileRelPath)
-
-lastScanRelPath = "lastscan.txt"
-lastScanAbsPath = os.path.join(script_dir, lastScanRelPath)
+newScansFilePath = os.path.join(script_dir, "newscans.csv")
 
 barcode = ""
 totaltime = 0
 
-def clearScreen():
-    lcd.clear()
-    lcd.set_backlight(0)
-
-def display(message):
-    lcd.clearScreen
-    lcd.set_backlight(1)
-    lcd.message(message)
-    reset_timer()
-
-def reset_timer():
-    timer = Timer(3.0, clearScreen)
-    timer.start()
-
-timer = Timer(3.0, clearScreen)
-clearScreen()
-
-lcd.set_backlight(1)
-lcd.message("Attendance\nScanner v2.1")
+lcd.display("Attendance\nScanner v2.1.1")
 
 while 1 == 1:
     # MARK: Get member barcode and put it in the records CSV
@@ -49,7 +26,7 @@ while 1 == 1:
             barcode += char
     else:
         if len(barcode) > 4:
-            timer.cancel()
+            lcd.cancel_timer()
             currenttime = datetime.today()
 
             with open(scansFileAbsPath, 'r') as csvfile:
@@ -70,7 +47,7 @@ while 1 == 1:
                             bottle_list = []
 
                             # Read all data from the csv file.
-                            with open(scansFileAbsPath, 'rb') as b:
+                            with open(newScansFilePath, 'rb') as b:
                                 bottles = csv.reader(b)
                                 bottle_list.extend(bottles)
 
@@ -78,20 +55,20 @@ while 1 == 1:
                             line_to_override = {rownum:[row['id'], str(firsttime) ,str(nowtime)] }
 
                             # Write data to the csv file and replace the lines in the line_to_override dict.
-                            with open(scansFileAbsPath, 'wb') as b:
+                            with open(newScansFilePath, 'wb') as b:
                                 writer = csv.writer(b)
                                 for line, row1 in enumerate(bottle_list):
                                     data = line_to_override.get(line, row1)
                                     writer.writerow(data)
 
                 if found == False:
-                    with open(scansFileAbsPath, 'a') as scansFile:
+                    with open(newScansFilePath, 'a') as scansFile:
                         scansFile.write(str(barcode) + "," + str(currenttime) + ", \n")
 
-                    display("Signed in\n" + barcode)
+                    lcd.display("Signed in\n" + barcode)
 
                 else:
                     hourslogged = datetime.strptime(str(totaltime), '%H:%M:%S.%f')
-                    display(barcode + "\n" + str(hourslogged.hour) + "hr " + str(hourslogged.minute) + "min")
-
+                    lcd.display(barcode + "\n" + str(hourslogged.hour) + "hr " + str(hourslogged.minute) + "min")
+                lcd.resetTimer()
         barcode = ""
