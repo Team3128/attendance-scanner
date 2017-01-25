@@ -1,6 +1,7 @@
 scans.csv
 tmp_data/
 config/privatekey.txt
+config/gpgpassphrase.txt
 *.pyc
 
 newscans.csv

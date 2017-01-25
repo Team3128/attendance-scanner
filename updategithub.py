@@ -39,6 +39,7 @@ newScansPath = os.path.join(script_dir, "newscans.csv")
 
 # CONFIG FILE PATHS
 privateKeyPath = os.path.join(script_dir, "config/privatekey.txt")
+gpgPassPath = os.path.join(script_dir, "config/gpgpassphrase.txt")
 
 lcd.display("Uploading...\nDo not scan.")
 
@@ -51,7 +52,7 @@ for repo in g.get_user().get_repos():
         with open(scansEncryptedPath, 'w') as scansEnc:
             scansEnc.write(repo.get_file_contents('/private/scans.csv.gpg').decoded_content)
 
-        os.system("gpg -o " + scansUnhashedPath + " -d " + scansEncryptedPath)
+        os.system("gpg --passphrase-fd 0 < " + gpgPassPath + " -o " + scansUnhashedPath + " -d " + scansEncryptedPath)
 
         with open(scansUnhashedPath, 'a') as scans:
             with open(newScansPath, 'r') as newScans:
@@ -137,7 +138,5 @@ os.remove(buildSeasonHoursEncryptedPath)
 os.remove(scansPath)
 os.remove(scansUnhashedPath)
 os.remove(scansEncryptedPath)
-
-os.remove(newScansPath)
 
 lcd.clear_screen()
