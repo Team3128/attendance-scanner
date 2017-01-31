@@ -16,7 +16,8 @@ newScansFilePath = os.path.join(script_dir, "newscans.csv")
 barcode = ""
 totaltime = 0
 
-lcd.display("Attendance\nScanner v2.1.1")
+lcd.display("Attendance\nScanner v2.1.2")
+print("Attendance Scanner v2.1.2")
 
 while 1 == 1:
     # MARK: Get member barcode and put it in the records CSV
@@ -29,7 +30,7 @@ while 1 == 1:
             lcd.cancel_timer()
             currenttime = datetime.today()
 
-            with open(scansFileAbsPath, 'r') as csvfile:
+            with open(newScansFilePath, 'r') as csvfile:
                 reader = csv.DictReader(csvfile, fieldnames = ['id', 'timein', 'timeout'])
 
                 rownum = -1
@@ -70,5 +71,5 @@ while 1 == 1:
                 else:
                     hourslogged = datetime.strptime(str(totaltime), '%H:%M:%S.%f')
                     lcd.display(barcode + "\n" + str(hourslogged.hour) + "hr " + str(hourslogged.minute) + "min")
-                lcd.resetTimer()
+                lcd.reset_timer()
         barcode = ""

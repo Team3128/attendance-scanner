@@ -5,21 +5,23 @@ import time
 import getch
 import os
 import csv
+import subprocess
+import re
 
 from lcdpanel import LCDPanel
 lcd = LCDPanel(10.0)
 
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
 
-scansFileRelPath = "scans.csv"
-scansFileAbsPath = os.path.join(script_dir, scansFileRelPath)
+newScansFile = os.path.join(script_dir, "newscans.csv")
 
 print("Button apps starting up...")
 
 while 1 == 1:
-    if lcd.lcdPanel.is_pressed(LCD.SELECT):
+    if lcd.sel_button_pressed():
+        lcd.reset()
         signedin = 0
-        with open(scansFileAbsPath, 'r') as csvfile:
+        with open(newScansFile, 'r') as csvfile:
             reader = csv.DictReader(csvfile, fieldnames = ['id', 'timein', 'timeout'])
 
             ids = []
@@ -38,4 +40,17 @@ while 1 == 1:
             signedin = len(ids)
 
         lcd.display(str(signedin) + " people\nsigned in now.")
-        lcd.resetTimer()
+        lcd.reset_timer()
+    if lcd.up_button_pressed():
+        lcd.display("Please wait...")
+
+        os.system("sudo /sbin/ifup --force wlan0")
+        
+        lcd.clear_screen()
+        print("Displayed")
+    if lcd.down_button_pressed():
+        output = subprocess.check_output('ifconfig wlan0', shell=True)
+        ipaddr = re.search('(?<=10.31.28.)\w+', output)
+
+        lcd.display('IP:\n10.31.28.'+str(ipaddr.group(0)))
+        lcd.reset_timer()
