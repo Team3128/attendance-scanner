@@ -23,6 +23,9 @@ class LCDPanel:
 
     def down_button_pressed(self):
         return lcdPanel.is_pressed(LCD.DOWN)
+
+    def right_button_pressed(self):
+        return lcdPanel.is_pressed(LCD.RIGHT)
     
     def clear_screen(self):
         lcdPanel.clear()

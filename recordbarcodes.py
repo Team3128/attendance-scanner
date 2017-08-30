@@ -16,8 +16,8 @@ newScansFilePath = os.path.join(script_dir, "newscans.csv")
 barcode = ""
 totaltime = 0
 
-lcd.display("Attendance\nScanner v2.1.2")
-print("Attendance Scanner v2.1.2")
+lcd.display("Attendance\nScanner v2.1.3")
+print("Attendance Scanner v2.1.3")
 
 while 1 == 1:
     # MARK: Get member barcode and put it in the records CSV

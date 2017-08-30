@@ -13,6 +13,10 @@ lcd = LCDPanel(10.0)
 
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
 
+lastFilePath = os.path.join(script_dir, "last.txt")
+with open(lastFilePath, 'w') as lastfile:
+    lastfile.write("NOT")
+
 newScansFile = os.path.join(script_dir, "newscans.csv")
 
 print("Button apps starting up...")
@@ -50,7 +54,12 @@ while 1 == 1:
         print("Displayed")
     if lcd.down_button_pressed():
         output = subprocess.check_output('ifconfig wlan0', shell=True)
-        ipaddr = re.search('(?<=10.31.28.)\w+', output)
-
-        lcd.display('IP:\n10.31.28.'+str(ipaddr.group(0)))
+        try:
+            ipaddr = re.search('(?<=10.31.28.)\w+', output)
+            lcd.display('IP:\n10.31.28.'+str(ipaddr.group(0)))
+        except Exception:
+            lcd.display('IP: nope.')
         lcd.reset_timer()
+    if lcd.right_button_pressed():
+        with open(lastFilePath, 'r') as lastfile:
+            lcd.display(lastfile.read())

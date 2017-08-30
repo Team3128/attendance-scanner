@@ -40,7 +40,7 @@ class RecordProccess:
                     if found == False:
                         ids.append(row['id'])
                         hours.append(0.0)
-
+                        
                     timein = datetime.strptime(row['timein'], '%Y-%m-%d %H:%M:%S.%f')
                     timeout = datetime.strptime(row['timeout'], '%Y-%m-%d %H:%M:%S.%f')
 
