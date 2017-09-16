@@ -19,7 +19,7 @@ with open(lastFilePath, 'w') as lastfile:
 
 newScansFile = os.path.join(script_dir, "newscans.csv")
 
-print("Button apps starting up...")
+print("LCD Button Apps")
 
 while 1 == 1:
     if lcd.sel_button_pressed():
@@ -49,7 +49,7 @@ while 1 == 1:
         lcd.display("Please wait...")
 
         os.system("sudo /sbin/ifup --force wlan0")
-        
+
         lcd.clear_screen()
         print("Displayed")
     if lcd.down_button_pressed():

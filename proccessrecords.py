@@ -1,6 +1,7 @@
 import sys
 import time
 import getch
+import evdev
 import os
 import csv
 from datetime import datetime
@@ -40,7 +41,7 @@ class RecordProccess:
                     if found == False:
                         ids.append(row['id'])
                         hours.append(0.0)
-                        
+
                     timein = datetime.strptime(row['timein'], '%Y-%m-%d %H:%M:%S.%f')
                     timeout = datetime.strptime(row['timeout'], '%Y-%m-%d %H:%M:%S.%f')
 

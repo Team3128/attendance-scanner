@@ -16,60 +16,61 @@ newScansFilePath = os.path.join(script_dir, "newscans.csv")
 barcode = ""
 totaltime = 0
 
-lcd.display("Attendance\nScanner v2.1.3")
-print("Attendance Scanner v2.1.3")
+device = evdev.InputDevice('/dev/input/event1')
 
-while 1 == 1:
-    # MARK: Get member barcode and put it in the records CSV
-    char = getch.getch()
-    if char != " ":
-        if char[:1].isdigit() :
-            barcode += char
-    else:
-        if len(barcode) > 4:
-            lcd.cancel_timer()
-            currenttime = datetime.today()
+lcd.display("Attendance\nScanner v2.2.0")
+print("Attendance Scanner v2.2.0")
 
-            with open(newScansFilePath, 'r') as csvfile:
-                reader = csv.DictReader(csvfile, fieldnames = ['id', 'timein', 'timeout'])
+for event in device.read_loop():
+    if event.type == evdev.ecodes.EV_KEY:
+        letter = event.code[4:]
+        if letter.isdigit():
+            barcode += letter
+        else if letter == "SPACE":
+            if len(barcode) > 4:
+                lcd.cancel_timer()
+                currenttime = datetime.today()
 
-                rownum = -1
-                found = False
+                with open(newScansFilePath, 'r') as csvfile:
+                    reader = csv.DictReader(csvfile, fieldnames = ['id', 'timein', 'timeout'])
 
-                for row in reader:
-                    rownum = rownum + 1
-                    if row['id'] == barcode and row['timeout'] == ' ':
-                        firsttime = datetime.strptime(row['timein'], '%Y-%m-%d %H:%M:%S.%f')
-                        nowtime = datetime.strptime(str(currenttime), '%Y-%m-%d %H:%M:%S.%f')
+                    rownum = -1
+                    found = False
 
-                        if firsttime.date() == nowtime.date():
-                            found = True
-                            totaltime = nowtime - firsttime
-                            bottle_list = []
+                    for row in reader:
+                        rownum = rownum + 1
+                        if row['id'] == barcode and row['timeout'] == ' ':
+                            firsttime = datetime.strptime(row['timein'], '%Y-%m-%d %H:%M:%S.%f')
+                            nowtime = datetime.strptime(str(currenttime), '%Y-%m-%d %H:%M:%S.%f')
 
-                            # Read all data from the csv file.
-                            with open(newScansFilePath, 'rb') as b:
-                                bottles = csv.reader(b)
-                                bottle_list.extend(bottles)
+                            if firsttime.date() == nowtime.date():
+                                found = True
+                                totaltime = nowtime - firsttime
+                                bottle_list = []
 
-                            # data to override in the format {line_num_to_override:data_to_write}.
-                            line_to_override = {rownum:[row['id'], str(firsttime) ,str(nowtime)] }
+                                # Read all data from the csv file.
+                                with open(newScansFilePath, 'rb') as b:
+                                    bottles = csv.reader(b)
+                                    bottle_list.extend(bottles)
 
-                            # Write data to the csv file and replace the lines in the line_to_override dict.
-                            with open(newScansFilePath, 'wb') as b:
-                                writer = csv.writer(b)
-                                for line, row1 in enumerate(bottle_list):
-                                    data = line_to_override.get(line, row1)
-                                    writer.writerow(data)
+                                # data to override in the format {line_num_to_override:data_to_write}.
+                                line_to_override = {rownum:[row['id'], str(firsttime) ,str(nowtime)] }
 
-                if found == False:
-                    with open(newScansFilePath, 'a') as scansFile:
-                        scansFile.write(str(barcode) + "," + str(currenttime) + ", \n")
+                                # Write data to the csv file and replace the lines in the line_to_override dict.
+                                with open(newScansFilePath, 'wb') as b:
+                                    writer = csv.writer(b)
+                                    for line, row1 in enumerate(bottle_list):
+                                        data = line_to_override.get(line, row1)
+                                        writer.writerow(data)
 
-                    lcd.display("Signed in\n" + barcode)
+                    if found == False:
+                        with open(newScansFilePath, 'a') as scansFile:
+                            scansFile.write(str(barcode) + "," + str(currenttime) + ", \n")
 
-                else:
-                    hourslogged = datetime.strptime(str(totaltime), '%H:%M:%S.%f')
-                    lcd.display(barcode + "\n" + str(hourslogged.hour) + "hr " + str(hourslogged.minute) + "min")
-                lcd.reset_timer()
-        barcode = ""
+                        lcd.display("Signed in\n" + barcode)
+
+                    else:
+                        hourslogged = datetime.strptime(str(totaltime), '%H:%M:%S.%f')
+                        lcd.display(barcode + "\n" + str(hourslogged.hour) + "hr " + str(hourslogged.minute) + "min")
+                    lcd.reset_timer()
+            barcode = ""
