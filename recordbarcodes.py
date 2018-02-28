@@ -7,6 +7,9 @@ import os
 import csv
 
 from lcdpanel import LCDPanel
+import evdev
+from evdev import ecodes
+
 lcd = LCDPanel(3.0)
 
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
@@ -16,17 +19,26 @@ newScansFilePath = os.path.join(script_dir, "newscans.csv")
 barcode = ""
 totaltime = 0
 
-device = evdev.InputDevice('/dev/input/event1')
+device = evdev.InputDevice('/dev/input/event0')
+
+for dev in [evdev.InputDevice(fn) for fn in evdev.list_devices()]:
+    if dev.name == "Barcode Reader ":
+        device = dev
 
 lcd.display("Attendance\nScanner v2.2.0")
 print("Attendance Scanner v2.2.0")
 
 for event in device.read_loop():
     if event.type == evdev.ecodes.EV_KEY:
-        letter = event.code[4:]
+        letter = ""
+        if event.value == 01:
+            letter = evdev.ecodes.KEY[event.code][4:]
+        else:
+            letter = "a"
+        
         if letter.isdigit():
             barcode += letter
-        else if letter == "SPACE":
+        elif letter == "SPACE":
             if len(barcode) > 4:
                 lcd.cancel_timer()
                 currenttime = datetime.today()

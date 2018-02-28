@@ -24,14 +24,5 @@ build_end = "2018-02-21"
 
 dataCommiter = DataCommit()
 
-previous_update_time = dater.strptime(str(dater.today()), '%Y-%m-%d %H:%M:%S.%f')
 
-while True:
-    current_update_time = dater.strptime(str(dater.today()), '%Y-%m-%d %H:%M:%S.%f')
-
-    if current_update_time.date() != previous_update_time.date() :
-        previous_update_time = dater.strptime(str(dater.today()), '%Y-%m-%d %H:%M:%S.%f')
-
-        dataCommiter.update(repo_name, year_start, year_end, build_start, build_end)
-
-    time.sleep(30000)
+dataCommiter.update(repo_name, year_start, year_end, build_start, build_end)
