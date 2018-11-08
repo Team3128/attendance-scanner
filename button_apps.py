@@ -33,19 +33,3 @@ class ButtonApps():
                     signed_in += 1
 
             self.lcd_panel.display("{} people\nsigned in now.".format(signed_in))
-            
-        if self.lcd_panel.up_button_pressed():
-            self.lcd_panel.display("Please wait...")
-
-            os.system("sudo /sbin/ifup --force wlan0")
-
-            self.lcd_panel.display("Network woken successfully.", 5)
-            
-        if self.lcd_panel.down_button_pressed():
-            output = subprocess.check_output('ifconfig wlan0', shell=True)
-
-            try:
-                ip_add = re.search('(?<=10.31.28.)\w+', output)
-                self.lcd_panel.display('IP:\n10.31.28.{}'.format(ip_add.group(0)))
-            except Exception:
-                self.lcd_panel.display('IP:\nnone.')

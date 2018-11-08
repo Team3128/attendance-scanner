@@ -1,5 +1,8 @@
 import sys
 import os
+import subprocess
+
+import re
 
 from threading import Thread
 
@@ -37,12 +40,14 @@ class AttendanceScanner:
                 if dev.name == "Barcode Reader ":
                     self.reader = dev
 
-        self.lcd_panel.display("Reader connected.", 2)
+        self.lcd_panel.display("Reader connected.")
 
         self.barcode_buffer = BarcodeBuffer()
         self.scan_logger = ScanLogger(new_scans_path)
         self.button_apps = ButtonApps(self.lcd_panel, new_scans_path)
         self.report_generator = ReportGenerator(new_scans_path, season, total_start, total_end, build_start, build_end)
+
+        time.sleep(2)
 
     def reader_loop(self):
         for event in self.reader.read_loop():
@@ -76,13 +81,33 @@ class AttendanceScanner:
 
                 self.report_generator.update()
 
-            time.sleep(30.0)
+            time.sleep(600)
 
     def run(self):
         print("Running Attendance Scanner.")
 
-        self.reader_thread = Thread(target=self.reader_loop, name="Reader Loop")
+        self.lcd_panel.display("Checking\ninternet...")
+
+        attempts = 0
+        while attempts < 10:
+            try:
+                match = re.search('inet addr', subprocess.check_output('ifconfig wlan0', shell=True))
+                break
+            except Exception:
+                attempts += 1
+
+        if attempts >= 10:
+            self.lcd_panel.display("Wi-Fi Error.\nPlease reboot.")
+            return None
+
+        self.lcd_panel.display("Internet\nConnected.", 2)
+
+        self.reader_thread = Thread(target=self.reader_loop, name="reader_loop")
         self.reader_thread.start()
+
+        self.button_thread = Thread(target=self.button_loop, name="button_loop")
+        self.button_thread.start()
+
         
 if __name__ == '__main__':
     scan = AttendanceScanner()

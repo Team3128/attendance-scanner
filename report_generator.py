@@ -35,38 +35,73 @@ class ReportGenerator:
     def __init__(self, new_scans_path, season, total_start, total_end, build_start, build_end):
         self.new_scans_path = new_scans_path
 
+        self.season = season
+
         self.total_start = total_start
         self.total_end = total_end
+        
         self.build_start = build_start
         self.build_end = build_end
 
         self.record_processor = RecordProccessor(new_scans_path)
 
     def update(self):
-        try:
-            with open(private_key_path, 'r') as private_key_file:
-                self.g = Github(private_key_file.read())
+        attempts = 0
+        while attempts < 3:
+            try:
+                with open(private_key_path, 'r') as private_key_file:
+                    self.g = Github(private_key_file.read())
 
-            for r in self.g.get_user().get_repos():
-                if r.name == "{}-attendance-data".format(season):
-                    self.repo = r
-        except:
-            print("GitHub connect failed. Perhaps internet broken?")
+                for r in self.g.get_user().get_repos():
+                    if r.name == "{}-attendance-data".format(self.season):
+                        self.repo = r
+
+                break
+            except:
+                attempts += 1
+
+        if attempts >= 3:
+            print("Could not connect to GitHub.")
             return None
         
-        today_date = str(datetime.date.today())
+        today_date = datetime.date.today()
+        today_date_str = str(today_date)
 
         shutil.rmtree('tmp_data', ignore_errors=True)
 
         os.mkdir('tmp_data')
         os.mkdir('tmp_data/priv')
+
+        # Filter new scans from before today
+        if not os.path.exists('backups'):
+            os.mkdir('backups')
+
+        backup_newscans_path = 'backups/newscans_{}.csv'.format(datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
+        os.rename(self.new_scans_path, backup_newscans_path)
+
+        open(self.new_scans_path, 'w').close()
+        today_rows = []
+
+        with open(backup_newscans_path, 'r') as newscans_backup_file:
+            for row in newscans_backup_file.readlines():
+                cells = row.split(',')
+
+                sign_date = datetime.strptime(cells[1], '%Y-%m-%d').date()
+
+                if sign_date < today_date:
+                    with open(self.new_scans_path, 'a') as new_scans_file:
+                        new_scans_file.write(row)
+                else:
+                    today_rows += [row]
         
+        # Download and unencrypt master scans file
         with open(scans_encrypted_path, 'w') as scans_encrypted_file:
             scans_encrypted_file.write(self.repo.get_file_contents('/scans.csv.gpg').decoded_content)
 
         with open(gpg_pass_path, 'r') as pass_file:
             os.system("echo '" + pass_file.read() + "' | gpg --passphrase-fd 0 -o '" + scans_unhashed_path + "' -d '" + scans_encrypted_path + "'")
 
+        # Append new scans entries
         with open(scans_unhashed_path, 'a') as scans_unhashed_file:
             with open(self.new_scans_path, 'r') as new_scans_file:
                 for row in new_scans_file.readlines():
@@ -110,7 +145,7 @@ class ReportGenerator:
         os.system("gpg -e -r 'Team 3128' " + build_season_unhashed_path)
         
 
-        msg = "Added Attendance Data for " + today_date
+        msg = "Added Attendance Data for " + today_date_str
 
         # Inserting in top level, unencrypted and hashed
         with open(total_hours_hashed_path, 'r') as total_hours_file:
@@ -132,12 +167,7 @@ class ReportGenerator:
         with open(scans_encrypted_path, 'r') as scans_encrypted_file:
             self.repo.update_file('/encrypted/scans.csv.gpg', msg, scans_encrypted_file.read(), self.repo.get_contents("encrypted/scans.csv.gpg").sha, "master")
 
-        try:
-            os.mkdir('backups')
-        except:
-            pass
-
-        os.rename(self.new_scans_path, 'backups/newscans_{}.csv'.format(datetime.now().strftime('%Y-%m-%d_%H:%M:%S')))
 
         with open(self.new_scans_path, 'w') as new_scans_file:
-            new_scans_file.write("id,date,time_in,time_out\n")
+            for row in today_rows:
+                new_scans_file.write(row)
