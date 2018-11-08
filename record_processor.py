@@ -16,13 +16,13 @@ class RecordProccessor:
 
         with open(self.new_scans_path, 'r') as new_scans_file:
             for row in new_scans_file.readlines():
-                cells = row.split(',')
+                cells = row.strip().split(',')
 
                 if cells[0] == 'id':
                     continue
 
                 sign_date = datetime.strptime(cells[1], '%Y-%m-%d').date()
-                sign_in_time = datetime.strptime(cells[1], '%H:%M:%S.%f').time()
+                sign_in_time = datetime.strptime(cells[2], '%H:%M:%S.%f').time()
 
                 if sign_date < start_date.date():
                     continue
@@ -31,19 +31,20 @@ class RecordProccessor:
                     continue
 
                 try:
-                    sign_out_time = datetime.strptime(cells[2], '%H:%M:%S.%f').time()
+                    sign_out_time = datetime.strptime(cells[3], '%H:%M:%S.%f').time()
+                    student_id = cells[0]
                 except:
                     continue
-
-                student_id = cells[0]
+                    
                 if student_id not in hours:
                     hours[student_id] = 0
 
-                hours[student_id] += round((sign_out_time - sign_in_time).total_seconds()/3600, 4)
+                hours[student_id] += round((datetime.combine(sign_date, sign_out_time) - datetime.combine(sign_date, sign_in_time)).total_seconds()/3600, 4)
 
-            sorted_ids = sorted(hours, key=hours.get)
+            sorted_ids = sorted(hours, key=hours.get, reverse=True)
 
             with open(output_path, 'w') as output_file:
+                output_file.write("Student ID, Hours\n")
                 for student_id in sorted_ids:
                     if should_hash == True:
                         output_file.write("{},{}\n".format(student_id[-4:], round(hours[student_id], 4)))

@@ -35,13 +35,6 @@ class ReportGenerator:
     def __init__(self, new_scans_path, season, total_start, total_end, build_start, build_end):
         self.new_scans_path = new_scans_path
 
-        with open(private_key_path, 'r') as private_key_file:
-            self.g = Github(private_key_file.read())
-
-        for r in self.g.get_user().get_repos():
-            if r.name == "{}-attendance-data".format(season):
-                self.repo = r
-
         self.total_start = total_start
         self.total_end = total_end
         self.build_start = build_start
@@ -50,6 +43,17 @@ class ReportGenerator:
         self.record_processor = RecordProccessor(new_scans_path)
 
     def update(self):
+        try:
+            with open(private_key_path, 'r') as private_key_file:
+                self.g = Github(private_key_file.read())
+
+            for r in self.g.get_user().get_repos():
+                if r.name == "{}-attendance-data".format(season):
+                    self.repo = r
+        except:
+            print("GitHub connect failed. Perhaps internet broken?")
+            return None
+        
         today_date = str(datetime.date.today())
 
         shutil.rmtree('tmp_data', ignore_errors=True)

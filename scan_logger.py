@@ -53,14 +53,14 @@ class ScanLogger:
                     continue
                 
                 sign_in_date = datetime.strptime(cells[1], '%Y-%m-%d').date()
-                sign_in_time = datetime.strptime(cells[1], '%H:%M:%S.%f').time()
+                sign_in_time = datetime.strptime(cells[2], '%H:%M:%S.%f').time()
 
                 # Did the student sign in today?
                 if sign_in_date != current_date:
                     continue
 
                 # Is the student still signed in?
-                if cells[2].strip() != "":
+                if cells[3].strip() != "":
                     continue
 
                 # If we get to this point, this row corresponds to the student having signed in earlier today and not yet signed out.
@@ -76,14 +76,16 @@ class ScanLogger:
                 logs = new_scans_file.read().splitlines()
 
             # Adding the sign-out time to the line containing the corresponding sign-in
-            logs[sign_in_line] = logs[sign_in_line].strip() + str(current_time) + "\n"
+            logs[sign_in_line] = logs[sign_in_line].strip() + str(current_time)
 
             # Writing the adjusted lines back to the file
             with open(self.new_scans_path, 'w') as new_scans_file:
-                new_scans_file.writelines(logs)
+                for log in logs:
+                    new_scans_file.write(log.strip() + '\n')
 
-            total_time = current_time - sign_in_time
-            return "{}hr {}min".format(total_time.hour, total_time.minute)
+            total_time = datetime.combine(current_date, current_time) - datetime.combine(current_date, sign_in_time)
+            
+            return "{}hr {}min".format(total_time.seconds//3600, total_time.seconds//60)
        
         # The student is signing in.
         else:

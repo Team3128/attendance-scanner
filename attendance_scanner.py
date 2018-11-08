@@ -29,7 +29,7 @@ class AttendanceScanner:
     def __init__(self):
         self.lcd_panel = LCDPanel()
 
-        self.lcd_panel.display("Connecting to reader...")
+        self.lcd_panel.display("Connecting\nto reader...")
 
         self.reader = None
         while self.reader == None:
@@ -37,9 +37,7 @@ class AttendanceScanner:
                 if dev.name == "Barcode Reader ":
                     self.reader = dev
 
-        self.lcd_panel.display("Reader connected.")
-        time.sleep(3)
-        self.lcd_panel.display("Connecting to WiFi...")
+        self.lcd_panel.display("Reader connected.", 2)
 
         self.barcode_buffer = BarcodeBuffer()
         self.scan_logger = ScanLogger(new_scans_path)
@@ -85,3 +83,7 @@ class AttendanceScanner:
 
         self.reader_thread = Thread(target=self.reader_loop, name="Reader Loop")
         self.reader_thread.start()
+        
+if __name__ == '__main__':
+    scan = AttendanceScanner()
+    scan.run()
