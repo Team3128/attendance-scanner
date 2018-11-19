@@ -32,6 +32,9 @@ class AttendanceScanner:
     def __init__(self):
         self.lcd_panel = LCDPanel()
 
+        self.lcd_panel.display("Attendance\nScanner v2.3.1")
+        time.sleep(3)
+
         self.lcd_panel.display("Connecting\nto reader...")
 
         self.reader = None
