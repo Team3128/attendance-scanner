@@ -43,7 +43,7 @@ class ReportGenerator:
         self.build_start = build_start
         self.build_end = build_end
 
-        self.record_processor = RecordProccessor(new_scans_path)
+        self.record_processor = RecordProccessor(scans_unhashed_path)
 
     def update(self):
         attempts = 0
@@ -64,7 +64,7 @@ class ReportGenerator:
             print("Could not connect to GitHub.")
             return None
         
-        today_date = datetime.date.today()
+        today_date = datetime.now().date()
         today_date_str = str(today_date)
 
         shutil.rmtree('tmp_data', ignore_errors=True)
@@ -95,8 +95,8 @@ class ReportGenerator:
                     today_rows += [row]
         
         # Download and unencrypt master scans file
-        with open(scans_encrypted_path, 'w') as scans_encrypted_file:
-            scans_encrypted_file.write(self.repo.get_file_contents('/scans.csv.gpg').decoded_content)
+        with open(scans_encrypted_path, 'wb') as scans_encrypted_file:
+            scans_encrypted_file.write(self.repo.get_file_contents('encrypted/scans.csv.gpg').decoded_content)
 
         with open(gpg_pass_path, 'r') as pass_file:
             os.system("echo '" + pass_file.read() + "' | gpg --passphrase-fd 0 -o '" + scans_unhashed_path + "' -d '" + scans_encrypted_path + "'")
@@ -108,7 +108,7 @@ class ReportGenerator:
                     cells = row.split(',')
 
                     if cells[0] != 'id':
-                        scans_unhashed_file.write(row + '\n')
+                        scans_unhashed_file.write(row)
 
         os.remove(scans_encrypted_path)
 
@@ -120,8 +120,13 @@ class ReportGenerator:
 
         with open(scans_unhashed_path, 'r') as scans_unhashed_file:
             with open(scans_hashed_path, 'w') as scans_hashed_file:
+                scans_hashed_file.write('Student ID (last 4 digits), Date, Sign-In Time, Sign-Out Time, Hours Logged\n')
+
                 for row in scans_unhashed_file.readlines():
                     cells = row.split(',')
+
+                    if len(cells) <= 1:
+                        continue
 
                     if cells[0] == 'id':
                         continue
@@ -130,13 +135,15 @@ class ReportGenerator:
 
                     sign_date = datetime.strptime(cells[1], '%Y-%m-%d').date()
 
-                    sign_in_time = datetime.strptime(cells[1], '%H:%M:%S.%f').time()
+                    sign_in_time = datetime.strptime(cells[2].strip(), '%H:%M:%S.%f').time()
+
                     try:
-                        sign_out_time = datetime.strptime(cells[2], '%H:%M:%S.%f').time()
-                        hours = round((sign_out_time - sign_in_time).total_seconds()/3600, 4)
+                        sign_out_time = datetime.strptime(cells[3].strip(), '%H:%M:%S.%f').time()
+                        hours = round((datetime.combine(sign_date, sign_out_time) - datetime.combine(sign_date, sign_in_time)).total_seconds()/3600, 4)
                     except:
-                        sign_out_time = ""
+                        sign_out_time = ''
                         hours = 0
+
 
                     scans_hashed_file.write("{},{},{},{},{}\n".format(hashed_student_id, sign_date, sign_in_time, sign_out_time, hours))
 
@@ -145,27 +152,27 @@ class ReportGenerator:
         os.system("gpg -e -r 'Team 3128' " + build_season_unhashed_path)
         
 
-        msg = "Added Attendance Data for " + today_date_str
+        msg = today_date_str + ": "
 
         # Inserting in top level, unencrypted and hashed
-        with open(total_hours_hashed_path, 'r') as total_hours_file:
-            self.repo.update_file('/totalhours.csv', msg, total_hours_file.read(), self.repo.get_contents("totalhours.csv").sha, "master")
+        with open(total_hours_hashed_path, 'rb') as total_hours_file:
+            self.repo.update_file('totalhours.csv', msg + 'Total Hours', total_hours_file.read(), self.repo.get_contents("totalhours.csv").sha, "master")
 
-        with open(build_season_hashed_path, 'r') as build_season_file:
-            self.repo.update_file('/buildseason.csv', msg, build_season_file.read(), self.repo.get_contents("buildseason.csv").sha, "master")
+        with open(build_season_hashed_path, 'rb') as build_season_file:
+            self.repo.update_file('buildseason.csv', msg + 'Build Season', build_season_file.read(), self.repo.get_contents("buildseason.csv").sha, "master")
 
-        with open(scans_hashed_path, 'r') as scans_hashed_file:
-            self.repo.update_file('/scans.csv', msg, scans_hashed_file.read(), self.repo.get_contents("scans.csv").sha, "master")
+        with open(scans_hashed_path, 'rb') as scans_hashed_file:
+            self.repo.update_file('scans.csv', msg + 'Scans', scans_hashed_file.read(), self.repo.get_contents("scans.csv").sha, "master")
 
         # Inserting in encrypted
-        with open(total_hours_encrypted_path, 'r') as total_hours_encrypted_file:
-            self.repo.update_file('/encrypted/totalhours.csv.gpg', msg, total_hours_encrypted_file.read(), self.repo.get_contents("encrypted/totalhours.csv.gpg").sha, "master")
+        with open(total_hours_encrypted_path, 'rb') as total_hours_encrypted_file:
+            self.repo.update_file('encrypted/totalhours.csv.gpg', msg + 'Encrypted Total Hours', total_hours_encrypted_file.read(), self.repo.get_contents("encrypted/totalhours.csv.gpg").sha, "master")
 
-        with open(build_season_encrypted_path, 'r') as build_season_encrypted_file:
-            self.repo.update_file('/encrypted/buildseason.csv.gpg', msg, build_season_encrypted_file.read(), self.repo.get_contents("encrypted/buildseason.csv.gpg").sha, "master")
+        with open(build_season_encrypted_path, 'rb') as build_season_encrypted_file:
+            self.repo.update_file('encrypted/buildseason.csv.gpg', msg + 'Encrypted Build Season', build_season_encrypted_file.read(), self.repo.get_contents("encrypted/buildseason.csv.gpg").sha, "master")
 
-        with open(scans_encrypted_path, 'r') as scans_encrypted_file:
-            self.repo.update_file('/encrypted/scans.csv.gpg', msg, scans_encrypted_file.read(), self.repo.get_contents("encrypted/scans.csv.gpg").sha, "master")
+        with open(scans_encrypted_path, 'rb') as scans_encrypted_file:
+            self.repo.update_file('encrypted/scans.csv.gpg', msg + 'Encrypted Scans', scans_encrypted_file.read(), self.repo.get_contents("encrypted/scans.csv.gpg").sha, "master")
 
 
         with open(self.new_scans_path, 'w') as new_scans_file:

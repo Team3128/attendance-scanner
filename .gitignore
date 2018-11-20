@@ -9,3 +9,5 @@ config/gpgpassphrase.txt
 *.pyc
 
 .vscode
+
+debugger.py

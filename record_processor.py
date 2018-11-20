@@ -5,8 +5,8 @@ import time
 from datetime import datetime
 
 class RecordProccessor:
-    def __init__(self, new_scans_path):
-        self.new_scans_path = new_scans_path
+    def __init__(self, scans_path):
+        self.scans_path = scans_path
 
     def process_data(self, output_path, start_date_str, end_date_str, should_hash):
         start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
@@ -14,9 +14,12 @@ class RecordProccessor:
 
         hours = {}
 
-        with open(self.new_scans_path, 'r') as new_scans_file:
-            for row in new_scans_file.readlines():
+        with open(self.scans_path, 'r') as scans_file:
+            for row in scans_file.readlines():
                 cells = row.strip().split(',')
+
+                if len(cells) <= 1:
+                    continue
 
                 if cells[0] == 'id':
                     continue
@@ -44,7 +47,11 @@ class RecordProccessor:
             sorted_ids = sorted(hours, key=hours.get, reverse=True)
 
             with open(output_path, 'w') as output_file:
-                output_file.write("Student ID, Hours\n")
+                if should_hash:
+                    output_file.write("Student ID (last 4 digits), Hours\n")
+                else:
+                    output_file.write("Student ID, Hours\n")
+
                 for student_id in sorted_ids:
                     if should_hash == True:
                         output_file.write("{},{}\n".format(student_id[-4:], round(hours[student_id], 4)))

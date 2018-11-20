@@ -32,7 +32,7 @@ class AttendanceScanner:
     def __init__(self):
         self.lcd_panel = LCDPanel()
 
-        self.lcd_panel.display("Attendance\nScanner v2.3.1")
+        self.lcd_panel.display("Attendance\nScanner v2.3.2")
         time.sleep(3)
 
         self.lcd_panel.display("Connecting\nto reader...")
@@ -70,10 +70,14 @@ class AttendanceScanner:
 
     def button_loop(self):
         while True:
-            self.button_apps.poll_buttons()
+            try:
+                self.button_apps.poll_buttons()
+            except:
+                self.lcd_panel.display("ERROR: Button\nApp Failed.", 3)
+                
             time.sleep(0.01)
 
-    def report_generation_loop(self):
+    def report_loop(self):
         previous_date = datetime.now().date()
 
         while True:
@@ -110,6 +114,9 @@ class AttendanceScanner:
 
         self.button_thread = Thread(target=self.button_loop, name="button_loop")
         self.button_thread.start()
+
+        self.report_thread = Thread(target=self.report_loop, name="report_loop")
+        self.report_thread.start()
 
         
 if __name__ == '__main__':
