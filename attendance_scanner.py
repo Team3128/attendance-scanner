@@ -86,9 +86,11 @@ class AttendanceScanner:
             if current_date != previous_date :
                 previous_date = current_date
 
+                self.lcd_panel.display("Uploading...\nDO NOT SCAN")
                 self.report_generator.update()
+                self.lcd_panel.clear_screen()
 
-            time.sleep(600)
+            time.sleep(1800)
 
     def run(self):
         print("Running Attendance Scanner.")
