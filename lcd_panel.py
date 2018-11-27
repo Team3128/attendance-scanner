@@ -9,7 +9,13 @@ class LCDPanel:
         self.adafruit_lcd.clear()
         self.adafruit_lcd.set_backlight(0)
 
+        self.message = None
+        self.timeout = -1
+
         self.timer = Timer(0, None)
+
+        self.watcher_thread = Thread(target=self.watcher_loop, name="watcher_loop")
+        self.watcher_thread.start()
     
     def sel_button_pressed(self):
         return self.adafruit_lcd.is_pressed(LCD.SELECT)
@@ -28,6 +34,17 @@ class LCDPanel:
         self.adafruit_lcd.set_backlight(0)
 
     def display(self, message, timeout = -1):
+        self.message = message
+        self.timeout = timeout
+
+    def watcher_loop(self):
+        while True:
+            if self.message != None:
+                self.lcd_display(self.message, self.timeout)
+
+                self.message = None
+
+    def lcd_display(self, message, timeout = -1):
         self.adafruit_lcd.clear()
         
         self.adafruit_lcd.set_backlight(1)
