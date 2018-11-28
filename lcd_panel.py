@@ -1,63 +1,78 @@
-from threading import Timer
+import queue
+from queue import Queue
+from threading import Thread
+import time
+
+from i_lcd_panel import ILCDPanel
 
 import Adafruit_CharLCD as LCD
 
 class LCDPanel:
-    def __init__(self):
-        self.adafruit_lcd = LCD.Adafruit_CharLCDPlate()
+    def __init__(self, cmd_q, data_q):
+        self.cmd_q = cmd_q
+        self.data_q = data_q
 
-        self.adafruit_lcd.clear()
-        self.adafruit_lcd.set_backlight(0)
+        self.lcd_thread = Thread(target=self.lcd_loop, name="lcd_loop")
+        self.lcd_thread.start()
 
-        self.message = None
-        self.timeout = -1
+    def lcd_loop(self):
+        self.lcd = ILCDPanel()
 
-        self.timer = Timer(0, None)
+        while True:
+            try:
+                cmd = self.cmd_q.get(False)
+                cmd_type = cmd.__name__
 
-        self.watcher_thread = Thread(target=self.watcher_loop, name="watcher_loop")
-        self.watcher_thread.start()
-    
-    def sel_button_pressed(self):
-        return self.adafruit_lcd.is_pressed(LCD.SELECT)
+                if cmd_type == 'DisplayCMD':
+                    self.lcd.display(cmd.message, cmd.timeout)
 
-    def up_button_pressed(self):
-        return self.adafruit_lcd.is_pressed(LCD.UP)
+                elif cmd_type == 'ClearScreenCMD':
+                    self.lcd.clear_screen()
 
-    def down_button_pressed(self):
-        return self.adafruit_lcd.is_pressed(LCD.DOWN)
+                elif cmd_type == 'ResetTimerCMD':
+                    self.lcd.reset_timer(cmd.timeout)
 
-    def right_button_pressed(self):
-        return self.adafruit_lcd.is_pressed(LCD.RIGHT)
-    
-    def clear_screen(self):
-        self.adafruit_lcd.clear()
-        self.adafruit_lcd.set_backlight(0)
+                elif cmd_type == 'CancelTimerCMD':
+                    self.lcd.cancel_timer()
 
-    def display(self, message, timeout = -1):
+                self.cmd_q.task_done()
+
+            except queue.Empty:
+                pass
+
+            up = self.lcd.button_pressed(LCD.UP)
+            right = self.lcd.button_pressed(LCD.RIGHT)
+            down = self.lcd.button_pressed(LCD.DOWN)
+            left = self.lcd.button_pressed(LCD.LEFT)
+
+            select = self.lcd.button_pressed(LCD.SELECT)
+
+            self.data_q.put(ButtonDATA(up, right, down, left, select))
+            time.sleep(0.01)
+
+class DisplayCMD:
+    def __init__(self, message, timeout = -1):
         self.message = message
         self.timeout = timeout
 
-    def watcher_loop(self):
-        while True:
-            if self.message != None:
-                self.lcd_display(self.message, self.timeout)
+class ClearScreenCMD:
+    def __init__(self):
+        pass
 
-                self.message = None
+class ResetTimerCMD:
+    def __init__(self, timeout):
+        self.timeout = timeout
 
-    def lcd_display(self, message, timeout = -1):
-        self.adafruit_lcd.clear()
-        
-        self.adafruit_lcd.set_backlight(1)
-        self.adafruit_lcd.message(message)
+class CancelTimerCMD:
+    def __init__(self):
+        pass
 
-        if timeout >= 0:
-            self.reset_timer(timeout)
 
-    def reset_timer(self, timeout):
-        self.cancel_timer()
+class ButtonDATA:
+    def __init__(self, up, right, down, left, select):
+        self.up = up
+        self.right = right
+        self.down = down
+        self.left = left
 
-        self.timer = Timer(timeout, self.clear_screen)
-        self.timer.start()
-
-    def cancel_timer(self):
-        self.timer.cancel()
+        self.select = select

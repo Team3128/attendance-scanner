@@ -6,15 +6,20 @@ import time
 
 from datetime import datetime
 
+from lcd_panel import ButtonDATA
+from lcd_panel import DisplayCMD
+from lcd_panel import ClearScreenCMD
+
 class ButtonApps():
-    def __init__(self, lcd_panel, new_scans_path):
-        self.lcd_panel = lcd_panel
+    def __init__(self, new_scans_path, cmd_q):
         self.new_scans_path = new_scans_path
+
+        self.cmd_q = cmd_q
 
         self.rebooting = False
 
-    def poll_buttons(self):
-        if self.lcd_panel.sel_button_pressed():
+    def poll_buttons(self, button_data):
+        if button_data.select:
             signed_in = 0
 
             current_date = datetime.now().date()
@@ -35,20 +40,20 @@ class ButtonApps():
 
                     signed_in += 1
 
-            self.lcd_panel.display("{} people\nsigned in now.".format(signed_in))
+            self.cmd_q.put(DisplayCMD("{} people\nsigned in now.".format(signed_in)))
 
-        if self.lcd_panel.up_button_pressed():
-            self.lcd_panel.display("Reboot? Press\nDOWN to confirm.")
+        if button_data.up:
+            self.cmd_q.put(DisplayCMD("Reboot? Press\nDOWN to confirm."))
             self.rebooting = True
 
             time.sleep(5)
 
-            self.lcd_panel.clear_screen()
+            self.cmd_q.put(ClearScreenCMD())
             self.rebooting = False
 
-        if self.lcd_panel.down_button_pressed():
+        if button_data.down:
             if self.rebooting:
-                self.lcd_panel.display("Rebooting...")
+                self.cmd_q.put(DisplayCMD("Rebooting..."))
                 time.sleep(2)
                 
                 os.system('reboot')
