@@ -41,7 +41,7 @@ class AttendanceScanner:
 
         self.lcd_panel = LCDPanel(self.cmd_q, self.data_q)
 
-        self.cmd_q.put(DisplayCMD("Attendance\nScanner v2.3.4"))
+        self.cmd_q.put(DisplayCMD("Attendance\nScanner v2.3.5"))
         time.sleep(3)
 
         self.cmd_q.put(DisplayCMD("Connecting\nto reader..."))
@@ -112,7 +112,8 @@ class AttendanceScanner:
         attempts = 0
         while attempts < 10:
             try:
-                match = re.search('inet addr', subprocess.check_output('ifconfig wlan0', shell=True))
+                match = re.search('inet', str(subprocess.check_output('ifconfig wlan0', shell=True)))                
+                print(attempts)
                 break
             except Exception:
                 attempts += 1

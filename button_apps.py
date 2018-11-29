@@ -40,7 +40,7 @@ class ButtonApps():
 
                     signed_in += 1
 
-            self.cmd_q.put(DisplayCMD("{} people\nsigned in now.".format(signed_in)))
+            self.cmd_q.put(DisplayCMD("{} people\nsigned in now.".format(signed_in), 5))
 
         if button_data.up:
             self.cmd_q.put(DisplayCMD("Reboot? Press\nDOWN to confirm."))

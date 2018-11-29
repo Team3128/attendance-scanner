@@ -17,14 +17,20 @@ class LCDPanel:
 
     def lcd_loop(self):
         self.lcd = ILCDPanel()
-
+        clear_time = None
+        
         while True:
+            if clear_time != None and time.time() > clear_time:
+                self.lcd.clear_screen()
+                
             try:
                 cmd = self.cmd_q.get(False)
-                cmd_type = cmd.__name__
+                cmd_type = type(cmd).__name__
 
                 if cmd_type == 'DisplayCMD':
-                    self.lcd.display(cmd.message, cmd.timeout)
+                    self.lcd.display(cmd.message)
+                    if cmd.timeout > 0:
+                        clear_time = time.time() + cmd.timeout
 
                 elif cmd_type == 'ClearScreenCMD':
                     self.lcd.clear_screen()
