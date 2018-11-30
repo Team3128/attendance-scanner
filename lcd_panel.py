@@ -22,6 +22,7 @@ class LCDPanel:
         while True:
             if clear_time != None and time.time() > clear_time:
                 self.lcd.clear_screen()
+                clear_time = None
                 
             try:
                 cmd = self.cmd_q.get(False)
@@ -36,10 +37,10 @@ class LCDPanel:
                     self.lcd.clear_screen()
 
                 elif cmd_type == 'ResetTimerCMD':
-                    self.lcd.reset_timer(cmd.timeout)
+                    clear_time = time.time() + cmd.timeout
 
                 elif cmd_type == 'CancelTimerCMD':
-                    self.lcd.cancel_timer()
+                    clear_time = None
 
                 self.cmd_q.task_done()
 
