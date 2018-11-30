@@ -3,4 +3,5 @@
 cd ~
 cd attendance-scanner
 
-python3 attendance_scanner.py
+echo Startup Script
+python3 -u attendance_scanner.py 
