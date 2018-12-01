@@ -41,6 +41,8 @@ class AttendanceScanner:
 
         self.lcd_panel = LCDPanel(self.cmd_q, self.data_q)
 
+        print('Starting attendance_scanner.py')
+
         self.cmd_q.put(DisplayCMD("Attendance\nScanner v2.3.5"))
         time.sleep(3)
 
