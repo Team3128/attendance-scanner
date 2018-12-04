@@ -39,7 +39,7 @@ class ReportGenerator:
 
         self.total_start = total_start
         self.total_end = total_end
-        
+
         self.build_start = build_start
         self.build_end = build_end
 
@@ -85,6 +85,9 @@ class ReportGenerator:
         with open(backup_newscans_path, 'r') as newscans_backup_file:
             for row in newscans_backup_file.readlines():
                 cells = row.split(',')
+
+                if len(cells) < 3:
+                    continue
 
                 sign_date = datetime.strptime(cells[1], '%Y-%m-%d').date()
 
