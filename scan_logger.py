@@ -23,7 +23,7 @@ class BarcodeBuffer:
 
         if key == "SPACE":
             return self.barcode
-        
+
         return None
 
     def flush(self):
@@ -48,12 +48,12 @@ class ScanLogger:
         with open(self.new_scans_path, 'r') as new_scans_file:
             # Searching the new scans file to determine if the student is signing out
             for line, row in enumerate(new_scans_file.read().splitlines()):
-                cells = row.split(',') 
+                cells = row.split(',')
 
                 # Does the row actually correspond to this student?
                 if cells[0] != student_id:
                     continue
-                
+
                 sign_in_date = datetime.strptime(cells[1], '%Y-%m-%d').date()
                 sign_in_time = datetime.strptime(cells[2], '%H:%M:%S.%f').time()
 
@@ -86,9 +86,9 @@ class ScanLogger:
                     new_scans_file.write(log.strip() + '\n')
 
             total_time = datetime.combine(current_date, current_time) - datetime.combine(current_date, sign_in_time)
-            
-            return "{}hr {}min".format(total_time.seconds//3600, total_time.seconds//60)
-       
+
+            return "{}hr {}min".format(total_time.seconds//3600, (total_time.seconds//60)%60)
+
         # The student is signing in.
         else:
             with open(self.new_scans_path, 'a') as new_scans_file:

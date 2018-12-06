@@ -96,7 +96,7 @@ class ReportGenerator:
                         new_scans_file.write(row)
                 else:
                     today_rows += [row]
-        
+
         # Download and unencrypt master scans file
         with open(scans_encrypted_path, 'wb') as scans_encrypted_file:
             scans_encrypted_file.write(self.repo.get_file_contents('encrypted/scans.csv.gpg').decoded_content)

@@ -43,7 +43,7 @@ class AttendanceScanner:
 
         print('Starting attendance_scanner.py')
 
-        self.cmd_q.put(DisplayCMD("Attendance\nScanner v2.3.5"))
+        self.cmd_q.put(DisplayCMD("Attendance\nScanner v2.3.6"))
         time.sleep(3)
 
         self.cmd_q.put(DisplayCMD("Connecting\nto reader..."))
@@ -71,7 +71,7 @@ class AttendanceScanner:
                 continue
 
             self.barcode_buffer.flush()
-            
+
             hours = self.scan_logger.log_scan(barcode)
 
             if hours == "":
