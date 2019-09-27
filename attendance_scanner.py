@@ -26,13 +26,13 @@ from evdev import ecodes
 
 new_scans_path = "newscans.csv"
 
-season = "2018-19"
+season = "2019-20"
 
-total_start = "2018-09-07"
+total_start = "2019-09-07"
 total_end = "2019-06-14"
 
-build_start = "2019-01-05"
-build_end = "2019-02-19"
+build_start = "2012-01-04"
+build_end = "2019-03-05"
 
 class AttendanceScanner:
     def __init__(self):
