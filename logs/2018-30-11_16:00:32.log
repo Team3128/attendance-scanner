@@ -1,0 +1,5 @@
+Startup Script
+  File "attendance_scanner.py", line 44
+    print('Starting attendance_scanner.py')
+                                          ^
+TabError: inconsistent use of tabs and spaces in indentation

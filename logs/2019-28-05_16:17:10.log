@@ -1,0 +1,24 @@
+Startup Script
+Starting attendance_scanner.py
+Running Attendance Scanner.
+0
+gpg: encrypted with 2048-bit RSA key, ID 5F2D5952674EFCDD, created 2016-09-08
+      "Team 3128 (Attendance Scanner) <info@team3128.org>"
+Exception in thread report_loop:
+Traceback (most recent call last):
+  File "/usr/lib/python3.5/threading.py", line 914, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.5/threading.py", line 862, in run
+    self._target(*self._args, **self._kwargs)
+  File "attendance_scanner.py", line 104, in report_loop
+    self.report_generator.update()
+  File "/home/pi/attendance-scanner/report_generator.py", line 178, in update
+    self.repo.update_file('encrypted/scans.csv.gpg', msg + 'Encrypted Scans', scans_encrypted_file.read(), self.repo.get_contents("encrypted/scans.csv.gpg").sha, "master")
+  File "/home/pi/.local/lib/python3.5/site-packages/github/Repository.py", line 1609, in update_file
+    input=put_parameters
+  File "/home/pi/.local/lib/python3.5/site-packages/github/Requester.py", line 264, in requestJsonAndCheck
+    return self.__check(*self.requestJson(verb, url, parameters, headers, input, self.__customConnection(url)))
+  File "/home/pi/.local/lib/python3.5/site-packages/github/Requester.py", line 275, in __check
+    raise self.__createException(status, responseHeaders, output)
+github.GithubException.GithubException: 500 None
+

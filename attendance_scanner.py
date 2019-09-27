@@ -29,10 +29,10 @@ new_scans_path = "newscans.csv"
 season = "2019-20"
 
 total_start = "2019-09-07"
-total_end = "2019-06-14"
+total_end = "2020-06-14"
 
-build_start = "2012-01-04"
-build_end = "2019-03-05"
+build_start = "2020-01-04"
+build_end = "2020-03-05"
 
 class AttendanceScanner:
     def __init__(self):
@@ -43,7 +43,7 @@ class AttendanceScanner:
 
         print('Starting attendance_scanner.py')
 
-        self.cmd_q.put(DisplayCMD("Attendance\nScanner v2.3.6"))
+        self.cmd_q.put(DisplayCMD("Attendance\nScanner v2.3.7"))
         time.sleep(3)
 
         self.cmd_q.put(DisplayCMD("Connecting\nto reader..."))
