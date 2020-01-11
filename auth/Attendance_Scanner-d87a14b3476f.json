@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "attendance-scanner-264622",
+  "private_key_id": "d87a14b3476fe4ac8c34fefb01902ca8bdbf9641",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDRcBVdjrK5EVve\n0K69W03vS2cABeJI1BRL8moImKPgq6QGZIlSLk7DJsK8lHehsYkfDcwxlTAiQoF0\nwLhkWhLOARm6XIrIN17lcjAw7hOkwKZk2JDVcYPC7iZfczsfAU55+PW9eq0/Pmxc\nu5yZE3zFxAm5kBN373gsJd4+JORtERUqMm/SGPNsYty8u/SBnB2OFmEF9R9iRl2c\np9rfS7vwKkOua19RNXQL3Ylqyi05groEBTroCdPYMyNl+U/adWnSmpriP/zykIiU\nV+BRzqWe3vTxEP7zf6Bz5vtiQgBKDH95NPNegWtAVkZg6tTCJ0wpE3kPo3CEv7ZY\nr1ssQWFPAgMBAAECggEAQZbEWiRSPDr/dmwMDSkG4yXN/+fX0c74/D/SjRagW7/l\nAkuB5cayy9LbsYsdW/npY1xC0lRSWqhROmsQU/0RXophsEdC/yi4A0sbZHdql3Ht\nqi9YTD/cb7N9OO8xWKhkFzasXsaIcwHtlaz7gcTkklquYPqJ3kmUbN7/Fp8fGjhq\nSFCmZVrAPNEf9pjAUOU+k8Z2YqTYr12OP3L10IuIVfwQoirD+dcdky7z0xU5CY5T\nWQFOtUrMwhAFvBWGBtvFj8H8ky1iX+ha0QpoPttvs1Mic9qPJ7b4dT/l9MYJ3mrD\neGTkuydW9wtrDV+nUI9wee3/8BnEEYu6dHtnhop0QQKBgQDrFkifNmBZoYO55K+b\nVfdCKwZRjZjX9MZqVbKcIFog000oGU0RPIVMHc7AjrOs5MbS/LMDYPOzQSSPI9qi\nUbLrecp2mFQXCi/smpiwU6n09iNc086iMADEUh16S5MUQ8VDrPPNYOhWp1EdpRSP\nAVnvevT5iu+bhppOc3pDJS8iVwKBgQDkEa51YRUulAW+UDspTYBxGkGTuOGmnt2g\n/czQ8B8MGd15ZyyygeowSIHAANiIbcnC6iAtkQvS5W3G8rMh7euADJUdSgv1tSc/\nm0jTYDyOjEIuzZ4gqhLW/YK3XRUFA+Ahqh+Ody+UpJDIbkUTaJt0z6qGIL70u7EB\ngz6fj+cNyQKBgQDXOMRttluJU1wEcP/wJ0jB9B/Jw+d9NmP8b86gLuI0kR5fKqKq\nuAyU/ekN0tdd3ujDuoOtATK7FlWBEmMUHdW+zPZ1ksnRegscAwDs1PuQ/1KqpmLT\nizz4fvDryIqzj8PmTE275g9vXajeigaDUcpje98RIohwi09zqTbyh/VZ6wKBgDbJ\nJI5fztXMiwCnhz6ptmP0+bHBpLsAyJ6GuS+rrtmaUQB7z1nmKVqF4F0+FsXXEbN3\nyFkJ0bxMjq1O2ccZvwuYei15/xt787ys0batFH7tpGxXyldwY2wvo7nma0k0ICAW\nHNR9PvnG+lybWI6L/2P1CrKDpTtm5uNFIsLzr345AoGAad153SU1t7kCdIfno8y8\n5dXS5pKJn82/RpWJUurCDbJacb+bEwsmdr+aYX8MXiAPHqeK8AkEAdLJMopwShLo\ncZMwWK21SiOFfVEUzv7szXi3qABxAp/BBg5SCYX36lzzZWMOz00mYULTYVl5b5fT\n0fmT0ijpsw/VHdWtRBM0yE4=\n-----END PRIVATE KEY-----\n",
+  "client_email": "attendance-scanner-adham@attendance-scanner-264622.iam.gserviceaccount.com",
+  "client_id": "109330208510369356715",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/attendance-scanner-adham%40attendance-scanner-264622.iam.gserviceaccount.com"
+}
